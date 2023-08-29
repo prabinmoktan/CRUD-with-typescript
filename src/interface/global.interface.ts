@@ -5,3 +5,7 @@ export interface tableInterface {
    
 
 }
+export interface editInterface{
+    updName: string;
+    updPhoneNumber: number;
+}
