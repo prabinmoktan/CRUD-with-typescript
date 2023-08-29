@@ -6,63 +6,52 @@ import TableContainer from "@mui/material/TableContainer";
 import { useState, useEffect } from "react";
 import { tableInterface } from "./interface/global.interface";
 import axios from "axios";
-import { Formik } from "formik";
 import { TextField } from "@mui/material";
-import List from "./components/List";
 import AddIcon from "@mui/icons-material/Add";
 import * as React from "react";
 import { styled, Theme } from "@mui/system";
 import { Modal } from "@mui/base/Modal";
 import Fade from "@mui/material/Fade";
-// import * as Yup from "yup"
-import { useFormik } from "formik";
+import { Form, Formik, FormikProps, useFormik } from "formik";
 import { validationSchema } from "./schemas/ValidationSchemas";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-// interface tableInterface {
-//   phoneNumber: number;
-//   name: string;
-// }
-// const validationSchema = Yup.object({
-//   name: Yup
-//     .string("enter your name")
-//    .min(2, "at least 2 words")
-//     .required("name is required"),
-//   phoneNumber: Yup
-//     .number("enter your phone number")
-//     .min(10, "phone number should be of 10 digits")
-//     .required("Phone NUmber is required"),
-// });
-
 function App() {
   const [open, setOpen] = useState<boolean>(false);
   const [data, setData] = useState<tableInterface[]>([]);
-  const [appear, setAppear] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [savedData, setSavedData] = useState<tableInterface>([]);
+  const [editvalue , setEditValue] = useState<tableInterface>([])
 
-  const handleAppear = () => setAppear(true);
-  const handleDisappear = () => setAppear(false);
-  const handleOpen = () => setOpen(true);
+  // const handleAppear = () => setAppear(true);
+  // const handleDisappear = () => setAppear(false);
+  const openHandle = (id: number) => {
+    setIsEditing(true);
+    setSavedData(id);
+    setOpen(true);
+      };
+  const handleOpen = () => {
+    setIsEditing(false);
+    setOpen(true);
+  };
+
+  
   const handleClose = () => setOpen(false);
 
   useEffect(() => {
     axios.get("http://localhost:3000/user").then((response) => {
       setData(response.data);
     });
-  }, [data]);
+  }, []);
 
-  const initialValues: tableInterface = { name: "", phoneNumber: "" };
+  // {data.map((item)=>
+  //   setEditValue(item)
+  //   // console.log('item', item)
+  //  )};
 
-  const Formik = useFormik({
-    initialValues: initialValues,
-    validationSchema: validationSchema,
-    onSubmit: async (values: tableInterface) => {
-      const response = await axios.post("http://localhost:3000/user", values);
-      console.log(response.data);
-      setOpen(false);
-    },
-  });
-
+  const initialValues: tableInterface = { name: "", phoneNumber: "" }
+  
   const deleteHandler = (id: any) => {
     event?.preventDefault();
     axios
@@ -111,7 +100,7 @@ function App() {
                         <Button
                           variant="contained"
                           endIcon={<EditIcon />}
-                          onClick={handleAppear}
+                          onClick={()=>openHandle(user.id)}
                         >
                           Edit
                         </Button>
@@ -142,113 +131,186 @@ function App() {
         </Button>
       </Box>
 
-      <StyledModal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        open={open}
-        onClose={handleClose}
-        closeAfterTransition
-        slots={{ backdrop: StyledBackdrop }}
-      >
-        <Fade in={open}>
-          <Box sx={style}>
-            <h2 id="transition-modal-title"> fill up the form</h2>
-            <span id="transition-modal-description" style={{ marginTop: 16 }}>
-              <form onSubmit={Formik.handleSubmit}>
-                <TextField
-                  label="Name"
-                  size="small"
-                  sx={{ width: "100%", color: "blue" }}
-                  name="name"
-                  id="name"
-                  autoComplete="off"
-                  value={Formik.values.name}
-                  onChange={Formik.handleChange}
-                />
-                {Formik.errors.name ? (
-                  <Typography sx={{ color: "red" }}>
-                    {Formik.errors.name}
-                  </Typography>
-                ) : null}
-                <TextField
-                  label="Phone Number"
-                  size="small"
-                  type="number"
-                  autoComplete="off"
-                  sx={{ marginTop: "10px" }}
-                  name="phoneNumber"
-                  id="phoneNumber"
-                  value={Formik.values.phoneNumber}
-                  onChange={Formik.handleChange}
-                />
-                {Formik.errors.phoneNumber ? (
-                  <Typography sx={{ color: "red" }}>
-                    {Formik.errors.phoneNumber}
-                  </Typography>
-                ) : null}
-                <Box sx={{ margin: "auto", marginTop: "2em" }}>
-                  <span>
-                    <Button variant="contained" onClick={handleClose}>
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="success"
-                      sx={{ marginLeft: "10px" }}
-                      type="submit"
-                      // onClick={handleClose}
+      {isEditing ? (
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={async (values) => {
+            console.log(values)
+           
+            const response = await axios.patch(
+              `http://localhost:3000/user/${savedData}`,
+              values
+            );
+           setOpen(false)
+            console.log(response.data);
+          }}
+          
+        >
+          {({ values, handleChange, errors, handleSubmit }: any) => {
+            return (
+              <StyledModal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                open={open}
+                onClose={handleClose}
+                closeAfterTransition
+                slots={{ backdrop: StyledBackdrop }}
+              >
+                <Fade in={open}>
+                  <Box sx={style}>
+                    <h2 id="transition-modal-title"> Edit Details</h2>
+                    <span
+                      id="transition-modal-description"
+                      style={{ marginTop: 16 }}
                     >
-                      Save
-                    </Button>
+                      <form onSubmit={handleSubmit}>
+                        <TextField
+                          label="Name"
+                          size="small"
+                          sx={{ width: "100%", color: "blue" }}
+                          name="name"
+                          id="name"
+                          autoComplete="off"
+                          value={values.name}
+                          onChange={handleChange}
+                        />
+                        {errors.name ? (
+                          <Typography sx={{ color: "red" }}>
+                            {errors.name}
+                          </Typography>
+                        ) : null}
+                        <TextField
+                          label="Phone Number"
+                          size="small"
+                          type="number"
+                          autoComplete="off"
+                          sx={{ marginTop: "10px" }}
+                          name="phoneNumber"
+                          id="phoneNumber"
+                          value={values.phoneNumber}
+                          onChange={handleChange}
+                        />
+                        {errors.phoneNumber ? (
+                          <Typography sx={{ color: "red" }}>
+                            {errors.phoneNumber}
+                          </Typography>
+                        ) : null}
+                        <Box sx={{ margin: "auto", marginTop: "2em" }}>
+                          <span>
+                            <Button variant="contained" onClick={handleClose}>
+                              Cancel
+                            </Button>
+                            <Button
+                              variant="contained"
+                              color="success"
+                              sx={{ marginLeft: "10px" }}
+                              type="submit"
+                              >
+                              Save
+                            </Button>
+                          </span>
+                        </Box>
+                      </form>
+                    </span>
+                  </Box>
+                </Fade>
+              </StyledModal>
+            );
+          }}
+        </Formik>
+      ) : (
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={async (values, {resetForm}) => {
+            
+            const response = await axios.post(
+              "http://localhost:3000/user",
+              values
+            );
+            console.log(response.data)
+            
+            setOpen(false)
+            resetForm();
+            
+          }}
+        >
+          {({values, errors, handleChange,handleSubmit }: any )=>{
+            return(
+              <StyledModal
+              aria-labelledby="transition-modal-title"
+              aria-describedby="transition-modal-description"
+              open={open}
+              onClose={handleClose}
+              closeAfterTransition
+              slots={{ backdrop: StyledBackdrop }}
+            >
+              <Fade in={open}>
+                <Box sx={style}>
+                  <h2 id="transition-modal-title"> fill up the form</h2>
+                  <span
+                    id="transition-modal-description"
+                    style={{ marginTop: 16 }}
+                  >
+                    <form onSubmit={handleSubmit}>
+                      <TextField
+                        label="Name"
+                        size="small"
+                        sx={{ width: "100%", color: "blue" }}
+                        name="name"
+                        id="name"
+                        autoComplete="off"
+                        value={values.name}
+                        onChange={handleChange}
+                      />
+                      {errors.name ? (
+                        <Typography sx={{ color: "red" }}>
+                          {errors.name}
+                        </Typography>
+                      ) : null}
+                      <TextField
+                        label="Phone Number"
+                        size="small"
+                        type="number"
+                        autoComplete="off"
+                        sx={{ marginTop: "10px" }}
+                        name="phoneNumber"
+                        id="phoneNumber"
+                        value={values.phoneNumber}
+                        onChange={handleChange}
+                      />
+                      {errors.phoneNumber ? (
+                        <Typography sx={{ color: "red" }}>
+                          {errors.phoneNumber}
+                        </Typography>
+                      ) : null}
+                      <Box sx={{ margin: "auto", marginTop: "2em" }}>
+                        <span>
+                          <Button variant="contained" onClick={handleClose}>
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="contained"
+                            color="success"
+                            sx={{ marginLeft: "10px" }}
+                            type="submit"
+                            // onClick={handleClose}
+                          >
+                            Save
+                          </Button>
+                        </span>
+                      </Box>
+                    </form>
                   </span>
                 </Box>
-              </form>
-            </span>
-          </Box>
-        </Fade>
-      </StyledModal>
-      <StyledModal
-        aria-labelledby="unstyled-modal-title"
-        aria-describedby="unstyled-modal-description"
-        open={appear}
-        onClose={handleDisappear}
-        slots={{ backdrop: StyledBackdrop }}
-      >
-        <Box sx={style}>
-          <h2 id="unstyled-modal-title">Edit the details</h2>
-          <form onSubmit={Formik.handleSubmit}>
-            <TextField
-              size="small"
-              label="Name"
-              name="UpdName"
-              onChange={Formik.handleChange}
-              // value={Formik.values.UpdName}
-            />
-            <TextField
-              sx={{ marginTop: "5px" }}
-              size="small"
-              label="Phone Number"
-              name="UpdName"
-              onChange={Formik.handleChange}
-              // value={Formik.values.UpdName}
-            />
-            <Box
-              sx={{
-                marginTop: "10px",
-                display: "flex",
-                justifyContent: "space-around",
-              }}
-            >
-              <Button variant="contained" color="success">
-                Save changes
-              </Button>
-              <Button variant="contained" onClick={handleDisappear}>
-                Cancel
-              </Button>
-            </Box>
-          </form>
-        </Box>
-      </StyledModal>
+              </Fade>
+            </StyledModal>
+            )
+          }}
+          
+        </Formik>
+      )}
     </>
   );
 }
