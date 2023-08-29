@@ -24,8 +24,7 @@ function App() {
   const [savedData, setSavedData] = useState<tableInterface>([]);
   const [editvalue , setEditValue] = useState<tableInterface>([])
 
-  // const handleAppear = () => setAppear(true);
-  // const handleDisappear = () => setAppear(false);
+ 
   const openHandle = (id: number) => {
     setIsEditing(true);
     setSavedData(id);
@@ -43,12 +42,9 @@ function App() {
     axios.get("http://localhost:3000/user").then((response) => {
       setData(response.data);
     });
-  }, []);
+  }, [data]);
 
-  // {data.map((item)=>
-  //   setEditValue(item)
-  //   // console.log('item', item)
-  //  )};
+  
 
   const initialValues: tableInterface = { name: "", phoneNumber: "" }
   
