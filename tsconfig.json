@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "../project/src/components/Appnav.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

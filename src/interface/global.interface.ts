@@ -1,7 +1,7 @@
 export interface tableInterface {
-    id: number;
+    id?: number;
     name: string;
-    phoneNumber: number;
+    phoneNumber: string;
    
 
 }
