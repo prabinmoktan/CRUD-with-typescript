@@ -24,9 +24,9 @@ function App() {
   const [savedData, setSavedData] = useState<number | null>(null);
   const [editName, setEditName] = useState<string>("");
   const [editPhoneNumber, setEditPhoneNumber] = useState<string>("");
-  console.log(editName, editPhoneNumber, "edit name and phone number");
+  
 
-  const openHandle = async (id: number) => {
+  const openHandle = async (id: any) => {
     setIsEditing(true);
     setSavedData(id);
     setOpen(true);
@@ -49,27 +49,27 @@ function App() {
     axios.get("http://localhost:3000/user").then((response) => {
       setData(response.data);
     });
-  }, []);
+  }, [data]);
 
-  console.log(isEditing, "is editin");
+
 
   const initialState: tableInterface = {
     name: isEditing ? editName : "",
     phoneNumber: isEditing ? editPhoneNumber : "",
   };
 
-  console.log(initialState, "initialvalues");
+  
 
-  const deleteHandler = (id: any) => {
+  const deleteHandler = (id: number) => {
     event?.preventDefault();
     axios
       .delete(`http://localhost:3000/user/${id}`)
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      // .then((res) => {
+      //   console.log(res.data);
+      // })
+      // .catch((err) => {
+      //   console.log(err);
+      // });
       
   };
 
@@ -85,11 +85,13 @@ function App() {
         values
       );
       setOpen(false);
+    
       
     } else {
       const response = await axios.post("http://localhost:3000/user", values);
       resetForm();
       setOpen(false);
+    
     }
   };
 
