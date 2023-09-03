@@ -3,7 +3,7 @@ import TableHead from "@mui/material/TableHead";
 import { Box, Button, TableBody, TableRow, Typography } from "@mui/material";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { tableInterface } from "./interface/global.interface";
 import axios from "axios";
 import { TextField } from "@mui/material";
@@ -85,6 +85,7 @@ function App() {
         values
       );
       setOpen(false);
+      
     } else {
       const response = await axios.post("http://localhost:3000/user", values);
       resetForm();
