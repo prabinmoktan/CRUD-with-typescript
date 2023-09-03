@@ -60,7 +60,7 @@ function App() {
 
   
 
-  const deleteHandler = (id: number) => {
+  const deleteHandler = (id: any) => {
     event?.preventDefault();
     axios
       .delete(`http://localhost:3000/user/${id}`)
@@ -85,12 +85,14 @@ function App() {
         values
       );
       setOpen(false);
+      console.log(response)
     
       
     } else {
       const response = await axios.post("http://localhost:3000/user", values);
       resetForm();
       setOpen(false);
+      console.log(response)
     
     }
   };
