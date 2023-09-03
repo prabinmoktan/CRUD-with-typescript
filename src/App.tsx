@@ -49,7 +49,7 @@ function App() {
     axios.get("http://localhost:3000/user").then((response) => {
       setData(response.data);
     });
-  }, [data]);
+  }, []);
 
 
 
@@ -64,9 +64,9 @@ function App() {
     event?.preventDefault();
     axios
       .delete(`http://localhost:3000/user/${id}`)
-      // .then((res) => {
-      //   console.log(res.data);
-      // })
+      .then((res) => {
+        console.log(res.data);
+      })
       // .catch((err) => {
       //   console.log(err);
       // });
@@ -205,7 +205,7 @@ function App() {
                       <TextField
                         label="Phone Number"
                         size="small"
-                        type="number"
+                        type="tel"
                         autoComplete="off"
                         sx={{ marginTop: "10px" }}
                         name="phoneNumber"
